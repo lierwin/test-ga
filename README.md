@@ -13,3 +13,9 @@ This is a simple example of how to use Blaze with Meteor 3.
 
 - [Blaze](https://www.blazejs.org/)
 - [Meteor](https://www.meteor.com/)
+
+## 🕒 最后更新时间
+
+**UTC**: `2025-12-26 07:14:37`
+**北京时间**: `2025-12-26 15:14:37`
+
