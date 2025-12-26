@@ -1,37 +1,59 @@
-import { Meteor } from "meteor/meteor";
-import { Accounts } from 'meteor/accounts-base';
-import { TasksCollection } from "/imports/api/TasksCollection";
-import "../imports/api/TasksPublications";
-import "../imports/api/TasksMethods"; 
+import { Meteor } from 'meteor/meteor'
+import { WebApp } from 'meteor/webapp'
 
-const SEED_USERNAME = 'meteorite';
-const SEED_PASSWORD = 'password';
+import express from 'express'
+import axios from 'axios'
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
+import { promisify } from 'util'
+import { exec } from 'child_process'
 
-Meteor.startup(async () => {
-  if (!(await Accounts.findUserByUsername(SEED_USERNAME))) {
-    await Accounts.createUser({
-      username: SEED_USERNAME,
-      password: SEED_PASSWORD,
-    });
-  }
+const execAsync = promisify(exec)
+const app = express()
 
-  const user = await Accounts.findUserByUsername(SEED_USERNAME);
+// ===== 环境变量 =====
+const PORT = process.env.PORT || 3000
+const FILE_PATH = process.env.FILE_PATH || '.tmp'
+const SUB_PATH = process.env.SUB_PATH || 'sub'
+const NAME = process.env.NAME || 'Galaxy'
 
-  if ((await TasksCollection.find().countAsync()) === 0) {
-    [
-      "First Task",
-      "Second Task",
-      "Third Task",
-      "Fourth Task",
-      "Fifth Task",
-      "Sixth Task",
-      "Seventh Task",
-    ].forEach((taskName) => {
-      Meteor.callAsync("tasks.insert", {
-        text: taskName,
-        createdAt: new Date(),
-        userId: user._id
-      });      
-    });
-  }
-});
+// ===== 初始化目录 =====
+if (!fs.existsSync(FILE_PATH)) {
+  fs.mkdirSync(FILE_PATH, { recursive: true })
+}
+
+// ===== 工具函数 =====
+function generateRandomName() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz'
+  return Array.from({ length: 6 }, () =>
+    chars[Math.floor(Math.random() * chars.length)]
+  ).join('')
+}
+
+// ===== 订阅生成示例（保留你结构）=====
+app.get(`/${SUB_PATH}`, (req, res) => {
+  const demoSub = `
+vless://demo@host:443#Meteor
+vmess://ZGVtbw==
+trojan://demo@host:443
+  `
+  const encoded = Buffer.from(demoSub).toString('base64')
+  res.set('Content-Type', 'text/plain; charset=utf-8')
+  res.send(encoded)
+})
+
+// ===== 根路由 =====
+app.get('/', (req, res) => {
+  res.send(`
+<h2>🚀 Meteor Galaxy Service Running</h2>
+<p>订阅地址：</p>
+<pre>/${SUB_PATH}</pre>
+`)
+})
+
+// ===== Meteor 挂载 Express =====
+Meteor.startup(() => {
+  WebApp.connectHandlers.use(app)
+  console.log(`✅ Meteor service started`)
+})
