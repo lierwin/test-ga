@@ -1,17 +1,21 @@
 {
-  "name": "galaxy-meteor-app",
+  "name": "galaxy-app",
   "private": true,
   "scripts": {
-    "start": "meteor run"
+    "start": "meteor run",
+    "test": "meteor test --once --driver-package meteortesting:mocha"
   },
   "dependencies": {
-    "axios": "^1.6.7",
-    "express": "^4.19.2"
+    "@babel/runtime": "^7.20.7",
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "meteor-node-stubs": "^1.2.7"
   },
   "meteor": {
     "mainModule": {
-      "server": "server/main.js",
-      "client": "client/index.html"
-    }
+      "client": "client/main.js",
+      "server": "server/main.js"
+    },
+    "testModule": "tests/main.js"
   }
 }
